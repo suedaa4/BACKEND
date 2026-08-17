@@ -30,8 +30,24 @@ async function notUygulamasi() {
     notListesi = notListesi.filter((mevcutNot) => mevcutNot !== not);
     await fs.writeFile(dosyaAdi, JSON.stringify(notListesi, null, 2));
     console.log(`${not} başarıyla silindi!`);
+  } else if (komut === "listele") {
+    try {
+      const veri = await fs.readFile(dosyaAdi, "utf-8");
+      notListesi = JSON.parse(veri);
+
+      console.log("--- NOTLARIM ---");
+
+      notListesi.forEach((mevcutNot, index) => {
+        console.log(`${index + 1}.${mevcutNot}`);
+      });
+
+      console.log("----------------");
+    } catch (hata) {
+      console.log("Henüz hiç not eklenmemiş.");
+    }
   } else {
     console.log("Bilinmeyen bir komut girdiniz.");
   }
 }
+
 notUygulamasi();
