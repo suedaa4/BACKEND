@@ -8,6 +8,22 @@ const server = http.createServer((req, res) => {
   if (req.method === "GET" && req.url === "/notes") {
     res.writeHead(200, { "Content-Type": "text/plain" });
     res.end(JSON.stringify(notes));
+  } else if (req.method === "POST" && req.url === "/notes") {
+    let body = "";
+
+    req.on("data", (chunk) => {
+      body += chunk.toString();
+    });
+
+    // 2. When the stream ends, process the data
+    req.on("end", () => {
+      const newNote = JSON.parse(body); // Convert string to JSON object
+      notes.push(newNote); // Add to our in-memory array
+
+      // Send 201 (Created) response back to the client
+      res.writeHead(201, { "Content-Type": "application/json" });
+      res.end(JSON.stringify(newNote));
+    });
   } else {
     res.writeHead(404, { "Content-Type": "text/plain" });
     res.end(" 404 Not Found");
