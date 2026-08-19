@@ -5,6 +5,16 @@ const notes = [];
 const server = http.createServer((req, res) => {
   console.log(`New request: ${req.method} ${req.url}`);
 
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "OPTIONS, GET, POST");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  if (req.method === "OPTIONS") {
+    res.writeHead(204);
+    res.end();
+    return;
+  }
+
   if (req.method === "GET" && req.url === "/notes") {
     res.writeHead(200, { "Content-Type": "text/plain" });
     res.end(JSON.stringify(notes));
