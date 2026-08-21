@@ -9,6 +9,25 @@ const getNotes = (req, res) => {
   });
 };
 
+const createNote = (req, res) => {
+  const content = req.body.content;
+
+  if (!content) {
+    return res.status(400).json({
+      success: false,
+      message: "Content is required",
+    });
+  }
+
+  const addedNote = noteService.addNote(content);
+
+  res.status(201).json({
+    success: true,
+    data: addedNote,
+  });
+};
+
 module.exports = {
   getNotes,
+  createNote,
 };
