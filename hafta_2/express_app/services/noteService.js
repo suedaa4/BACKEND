@@ -1,45 +1,68 @@
-let notes = [
-  { id: 1, content: "Learn Express.js" },
-  { id: 2, content: "Master Layered Architecture" },
-];
+const pool = require("../db");
 
-const getAllNotes = () => {
-  return notes;
+const getAllNotes = async () => {
+  try {
+    const result = await pool.query("SELECT * FROM notes ORDER BY id ASC");
+    return result.rows;
+  } catch (err) {
+    console.error("Error fetching notes:", err.message);
+    throw err;
+  }
 };
 
-const addNote = (newContent) => {
-  const newNote = {
-    id: notes.length + 1,
-    content: newContent,
-  };
-  notes.push(newNote);
-  return newNote;
+const getNoteById = async (id) => {
+  try {
+    const result = await pool.query("SELECT * FROM notes WHERE id = $1", [id]);
+    return result.rows[0]; // Returns the single note or undefined if not found
+  } catch (err) {
+    console.error("Error fetching note by ID:", err.message);
+    throw err;
+  }
 };
 
-const getNoteById = (id) => {
-  return notes.find((note) => note.id === parseInt(id));
+const addNote = async (content) => {
+  try {
+    const result = await pool.query(
+      "INSERT INTO notes (content) VALUES ($1) RETURNING *",
+      [content],
+    );
+    return result.rows[0];
+  } catch (err) {
+    console.error("Error creating note:", err.message);
+    throw err;
+  }
 };
 
-const updateNote = (id, newContent) => {
-  const noteIndex = notes.findIndex((note) => note.id === parseInt(id));
-  if (noteIndex === -1) return null;
-
-  notes[noteIndex].content = newContent;
-  return notes[noteIndex];
+const updateNote = async (id, content) => {
+  try {
+    const result = await pool.query(
+      "UPDATE notes SET content = $1 WHERE id = $2 RETURNING *",
+      [content, id],
+    );
+    return result.rows[0];
+  } catch (err) {
+    console.error("Error updating note:", err.message);
+    throw err;
+  }
 };
 
-const deleteNote = (id) => {
-  const noteIndex = notes.findIndex((note) => note.id === parseInt(id));
-  if (noteIndex === -1) return false;
-
-  notes.splice(noteIndex, 1);
-  return true;
+const deleteNote = async (id) => {
+  try {
+    const result = await pool.query(
+      "DELETE FROM notes WHERE id = $1 RETURNING *",
+      [id],
+    );
+    return result.rowCount > 0; // Returns true if a row was successfully deleted
+  } catch (err) {
+    console.error("Error deleting note:", err.message);
+    throw err;
+  }
 };
 
 module.exports = {
   getAllNotes,
-  addNote,
   getNoteById,
+  addNote,
   updateNote,
   deleteNote,
 };

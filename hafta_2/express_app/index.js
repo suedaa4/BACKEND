@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+require("./db");
 const PORT = 3000;
 
 const noteRoutes = require("./routes/noteRoutes");
