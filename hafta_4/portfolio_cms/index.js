@@ -66,6 +66,30 @@ app.post("/api/auth/login", async (req, res) => {
   }
 });
 
+const verifyToken = (req, res, next) => {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+
+  if (!token) {
+    return res.status(401).json({ error: "Access denied. No token provided." });
+  }
+
+  try {
+    const verified = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = verified;
+    next();
+  } catch (err) {
+    res.status(403).json({ error: "Invalid or expired token" });
+  }
+};
+
+app.get("/api/admin/dashboard", verifyToken, (req, res) => {
+  res.json({
+    message: "Welcome to the protected admin dashboard!",
+    user: req.user,
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
