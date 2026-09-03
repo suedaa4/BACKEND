@@ -1,4 +1,5 @@
 const express = require("express");
+const app = express();
 const pool = require("./db");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -40,7 +41,6 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-const app = express();
 app.use(express.json());
 app.use("/uploads", express.static("uploads"));
 
